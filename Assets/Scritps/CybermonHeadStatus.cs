@@ -206,6 +206,7 @@ public class CybermonHeadStatus : MonoBehaviour
     {
         PositionUpdate();
         HPBarBoxUpdate();
+        //CheckAllOfStatuses();
         UpdateCybermonHeadStatusImageColor();
     }
 }

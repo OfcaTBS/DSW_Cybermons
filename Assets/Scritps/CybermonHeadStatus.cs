@@ -68,6 +68,7 @@ public class CybermonHeadStatus : MonoBehaviour
 
     public void UpdateTypeImage()
     {
+        Debug.Log("kurwa");
         /*switch (targetedCybermon.typeOfCybermon)
         {
             case TypeOfCybermon.Dark:
@@ -192,14 +193,31 @@ public class CybermonHeadStatus : MonoBehaviour
 
         isEXPBarBoxHidden = false;
         isStatusesBoxShowing = true;
-
+        
         UpdateNameAndLevel();
         CheckAllOfStatuses();
         CheckIfOwnerOfaTargetedCybermonIsAPlayer();
         UpdateCybermonHeadStatusImageColor();
+        
+
         targetedCybermon.OnTypeChange.AddListener(UpdateTypeImage);
         targetedCybermon.OnStatusAdd.AddListener(CheckAllOfStatuses);
+        
+        StartCoroutine(LateStart(1));
     }
+
+    IEnumerator LateStart(int secs)
+    {
+        yield return new WaitForSeconds(secs);
+        targetedCybermon.OnTypeChange.AddListener(UpdateTypeImage);
+        Debug.Log(gameObject.name + ": wykonano LateStart");
+    }
+
+    private void Awake()
+    {
+        //targetedCybermon.OnTypeChange.AddListener(UpdateTypeImage);
+    }
+
 
     // Update is called once per frame
     void Update()

@@ -278,9 +278,6 @@ public class Cybermon : MonoBehaviour
         AddMovesToAlreadyKnownMovesList();
     }
 
-    
-
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.K))

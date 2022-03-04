@@ -68,44 +68,7 @@ public class CybermonHeadStatus : MonoBehaviour
 
     public void UpdateTypeImage()
     {
-        Debug.Log("kurwa");
-        /*switch (targetedCybermon.typeOfCybermon)
-        {
-            case TypeOfCybermon.Dark:
-                typeImage.color = new Color(46, 43, 43);
-                break;
-            case TypeOfCybermon.Death:
-                typeImage.color = new Color(0, 0, 0);
-                break;
-            case TypeOfCybermon.Fire:
-                typeImage.color = new Color(217, 67, 2);
-                break;
-            case TypeOfCybermon.Grass:
-                typeImage.color = new Color(0, 191, 45);
-                break;
-            case TypeOfCybermon.Ground:
-                typeImage.color = new Color(97, 44, 0);
-                break;
-            case TypeOfCybermon.Ice:
-                typeImage.color = new Color(90, 239, 255);
-                break;
-            case TypeOfCybermon.Life:
-                typeImage.color = new Color(255, 248, 117);
-                break;
-            case TypeOfCybermon.Normal:
-                typeImage.color = new Color(230, 230, 230);
-                break;
-            case TypeOfCybermon.Poison:
-                typeImage.color = new Color(98, 0, 217);
-                break;
-            case TypeOfCybermon.Tech:
-                typeImage.color = new Color(0, 43, 4);
-                break;
-            case TypeOfCybermon.Water:
-                typeImage.color = new Color(0, 132, 255);
-                break;
-        }*/
-
+        Debug.Log("");
     }
     
     public void CheckAllOfStatuses()
@@ -163,7 +126,7 @@ public class CybermonHeadStatus : MonoBehaviour
         else if (!targetedCybermon.HasAnyStatuses() && isStatusesBoxShowing)
         {
             RemoveStatusesBoxSection();
-            isStatusesBoxShowing = true;
+            isStatusesBoxShowing = false;
         }
     }
 
@@ -171,6 +134,7 @@ public class CybermonHeadStatus : MonoBehaviour
     {
         if (targetedCybermon.isOwnerAPlayer == false)
         {
+            isEXPBarBoxHidden = true;
             RemoveEXPBoxSection();
         }
     }
@@ -178,30 +142,25 @@ public class CybermonHeadStatus : MonoBehaviour
     public void UpdateCybermonHeadStatusImageColor()
     {
         CybermonsHeadStatusImage.color = TypesOfCybermon.TypeColor(targetedCybermon.typeOfCybermon);
-        Debug.Log(targetedCybermon.typeOfCybermon);
     }
 
     void Start()
     {
-        //targetedCybermon = GameObject.Find("Cube").GetComponent<Cybermon>();
-        camera = GameObject.Find("Main Camera").GetComponent<Camera>();
-        //cbNameLevelText = GameObject.Find("CBNameLevelText").GetComponent<Text>();
-        //typeImage = GameObject.Find("TypeImage").GetComponent<Image>();
-        
-        
-        
+        camera = GameObject.Find("Main Camera").GetComponent<Camera>();      
 
-        isEXPBarBoxHidden = false;
+        isEXPBarBoxHidden = true;
         isStatusesBoxShowing = true;
-        
-        UpdateNameAndLevel();
         CheckAllOfStatuses();
+
+        UpdateNameAndLevel();
         CheckIfOwnerOfaTargetedCybermonIsAPlayer();
         UpdateCybermonHeadStatusImageColor();
         
-
         targetedCybermon.OnTypeChange.AddListener(UpdateTypeImage);
-        targetedCybermon.OnStatusAdd.AddListener(CheckAllOfStatuses);
+        targetedCybermon.OnAnyStatusAdd.AddListener(CheckAllOfStatuses);
+        targetedCybermon.OnAnyStatusRemove.AddListener(CheckAllOfStatuses);
+        targetedCybermon.OnGainHealth.AddListener(HPBarBoxUpdate);
+        targetedCybermon.OnTakeDamage.AddListener(HPBarBoxUpdate);
         
         StartCoroutine(LateStart(1));
     }
@@ -213,18 +172,10 @@ public class CybermonHeadStatus : MonoBehaviour
         Debug.Log(gameObject.name + ": wykonano LateStart");
     }
 
-    private void Awake()
-    {
-        //targetedCybermon.OnTypeChange.AddListener(UpdateTypeImage);
-    }
-
-
-    // Update is called once per frame
     void Update()
     {
         PositionUpdate();
         HPBarBoxUpdate();
-        //CheckAllOfStatuses();
         UpdateCybermonHeadStatusImageColor();
     }
 }

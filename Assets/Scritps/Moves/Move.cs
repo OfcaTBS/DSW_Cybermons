@@ -2,24 +2,79 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CMType;
+using System;
 
-public class Move : MonoBehaviour
+public class Move : MonoBehaviour, ICommand, IMediator
 {
-    // Start is called before the first frame update
-    public int maxPP;
-    public int currentPP;
+    [SerializeField] private int maxPP;
+    [SerializeField] private int currentPP;
     [TextArea]
-    public string moveDescription;
-    public TypeOfCybermon moveType;
-    public enum MoveTargetType { Self, ToEnemy}
-    public MoveTargetType myMoveTargetType;
-    public float moveAnimationLength;
-    public Cybermon moveOwnerCybermon;
+    [SerializeField] private string moveDescription;
+    [SerializeField] private string moveLog;
+    [SerializeField] private TypeOfCybermon moveType;
+    [SerializeField] private enum MoveTargetType { Self, ToEnemy}
+    [SerializeField] private MoveTargetType myMoveTargetType;
+    [SerializeField] private float moveAnimationLength;
+    [SerializeField] private Cybermon moveOwnerCybermon;
+    [SerializeField] private List<Cybermon> targetedCybermonsList;
+    [SerializeField] private List<CybermonIDandHPContainer> cybermonIDandDamageContainerList;
+    [SerializeField] private TurnManager turnManager;
+    [SerializeField] private PlayerMovesManager playerMovesManager;
+    [SerializeField] private CybermonsManager cybermonsManager;
+    [SerializeField] private Animator animator;
 
-    public Cybermon userCybermon, targetedCybermon;
-    public List<MoveAdditionalEffect> moveAdditionalEffectsList;
+    private void CurrentPPDown()
+    {
+        if (currentPP > 0)
+        {
+            currentPP--;
+        }
+    }
 
-    public bool isPPGreaterThanZero()
+    public int GetMaxPP()
+    {
+        return maxPP;
+    }
+
+    public TypeOfCybermon GetMoveType()
+    {
+        return moveType;
+    }
+
+    public int GetCurrentPP()
+    {
+        return currentPP;
+    }
+
+
+
+    private struct CybermonIDandHPContainer
+    {
+        string cybermondID;
+        int damage;
+        public CybermonIDandHPContainer(string _cybermonID, int _damage)
+        {
+            cybermondID = _cybermonID;
+            damage = _damage;
+        }
+    }
+
+    public string GetMoveDescription()
+    {
+        return moveDescription;
+    }
+
+    private void SetMoveOwnerCybermon(Cybermon _cybermon)
+    {
+        moveOwnerCybermon = _cybermon;
+    }
+
+    public Cybermon GetCybermonMoveOwner()
+    {
+        return moveOwnerCybermon;
+    }
+
+    public bool IsPPGreaterThanZero()
     {
         if (currentPP > 0)
         {
@@ -36,57 +91,67 @@ public class Move : MonoBehaviour
         Debug.Log(gameObject.name + ": My Private Move is Empty.");
     }
 
-    public void UseAdditionalEffects()
+    private void TryToLoadAnimator()
     {
-        foreach (MoveAdditionalEffect m in moveAdditionalEffectsList)
+        if (gameObject.GetComponent<Animator>() != null)
         {
-            m.UseAdditionalEffect(targetedCybermon);
+            animator = GetComponent<Animator>();
         }
     }
 
-    public void UseMove()
+    public virtual void Execute()
     {
-        if (myMoveTargetType == MoveTargetType.Self)
-        {
-            targetedCybermon = gameObject.transform.parent.transform.parent.gameObject.GetComponent<Cybermon>();
-        }
-        else
-        {
-                targetedCybermon = FindOpponentCybermon(moveOwnerCybermon);
-        }
-
-        if (isPPGreaterThanZero())
-        {
-            UsePrivateMove();
-            UseAdditionalEffects();
-            currentPP--;
-        }
-        
+        Debug.Log(gameObject.name + ": No Execute Command function created");
     }
 
-    public Cybermon FindOpponentCybermon(Cybermon moveOwner)
+    public virtual void Undo()
     {
-        List<Cybermon> CBList = new List<Cybermon>();
-        Cybermon CBtoReturn = new Cybermon();
-        CBList.AddRange(GameObject.FindObjectsOfType<Cybermon>());
-        foreach (Cybermon CB in CBList)
+        Debug.Log(gameObject.name + ": No Undo Command function created");
+    }
+
+    public void Notify(GameObject _sender, string _event, string[] _args)
+    {
+        if (_event == gameObject.name + ":UseMove")
         {
-            if (CB != moveOwnerCybermon)
+            if (IsPPGreaterThanZero())
             {
-                CBtoReturn = CB;
+                GameObject moveGameObjectCopy = Instantiate(gameObject, turnManager.transform);
+                Move moveCopy = moveGameObjectCopy.GetComponent<Move>();
+                moveCopy.SetMoveOwnerCybermon(gameObject.transform.parent.transform.parent.gameObject.GetComponent<Cybermon>());
+                moveCopy.targetedCybermonsList.Add(cybermonsManager.FindOpponentCybermon(moveCopy.GetCybermonMoveOwner()));
+                turnManager.AddCommand(moveCopy);
+
+                if (moveOwnerCybermon.cybermonStatsAndVariables.IsPlayerAOwner())
+                {
+                    CurrentPPDown();
+                    playerMovesManager.Notify(gameObject, gameObject.name + ":PPDown", null);
+                }
             }
             else
             {
-                continue;
+                Debug.Log(gameObject.name + ": Brak wystarczajacych punktow PP.");
             }
         }
-        return CBtoReturn;
+        else
+        {
+            Debug.Log("Unknown event. Sender: " + _sender.name + " , event: " + _event);
+        }
     }
-    public void Start()
+    private void Awake()
     {
-        moveAdditionalEffectsList.AddRange(gameObject.GetComponents<MoveAdditionalEffect>());
-        moveOwnerCybermon = gameObject.transform.parent.transform.parent.gameObject.GetComponent<Cybermon>();
+        turnManager = GameObject.Find("BattleTurnManager").GetComponent<TurnManager>();
+        cybermonsManager = GameObject.Find("CybermonsManager").GetComponent<CybermonsManager>();
+        playerMovesManager = GameObject.Find("PlayerMovesManager").GetComponent<PlayerMovesManager>();
+
+        if (moveOwnerCybermon == null)
+        {
+            moveOwnerCybermon = transform.parent.transform.parent.gameObject.GetComponent<Cybermon>();
+        }
+        TryToLoadAnimator();
     }
 
+    void Start()
+    {
 
+    }
 }

@@ -6,6 +6,6 @@ public class Ember : Move
 {
     public override void UsePrivateMove()
     {
-        targetedCybermon.TakeDamage(5);
+        //targetedCybermonsList.cybermonStatsAndVariables.TakeDamage(5);
     }
 }

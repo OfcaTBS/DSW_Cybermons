@@ -22,19 +22,19 @@ public class AddStatus : MoveAdditionalEffect
                 switch (statusToAdd)
                 {
                     case Status.Burn:
-                        targetedCybermon.AddStatusBurn();
+                        targetedCybermon.cybermonStatsAndVariables.AddStatusBurn();
                         break;
                     case Status.Sleeping:
-                        targetedCybermon.AddStatusSleep();
+                        targetedCybermon.cybermonStatsAndVariables.AddStatusSleep();
                         break;
                     case Status.Paralyzed:
-                        targetedCybermon.AddStatusParalyzed();
+                        targetedCybermon.cybermonStatsAndVariables.AddStatusParalyzed();
                         break;
                     case Status.Poisoned:
-                        targetedCybermon.AddStatusPoisoned();
+                        targetedCybermon.cybermonStatsAndVariables.AddStatusPoisoned();
                         break;
                     case Status.Frozen:
-                        targetedCybermon.AddStatusFrozen();
+                        targetedCybermon.cybermonStatsAndVariables.AddStatusFrozen();
                         break;
                 }
 

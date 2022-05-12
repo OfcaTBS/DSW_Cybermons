@@ -6,6 +6,6 @@ public class HealingDance : Move
 {
     public override void UsePrivateMove()
     {
-        targetedCybermon.AddHealth(20);
+        //targetedCybermonsList.cybermonStatsAndVariables.AddHealth(20);
     }
 }

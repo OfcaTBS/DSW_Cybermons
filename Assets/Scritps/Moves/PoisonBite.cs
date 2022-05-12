@@ -6,6 +6,6 @@ public class PoisonBite : Move
 {
     public override void UsePrivateMove()
     {
-        targetedCybermon.TakeDamage(3);
+        //targetedCybermonsList.cybermonStatsAndVariables.TakeDamage(3);
     }
 }

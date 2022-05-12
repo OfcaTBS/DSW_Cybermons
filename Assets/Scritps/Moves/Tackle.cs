@@ -6,6 +6,6 @@ public class Tackle : Move
 {
     public override void UsePrivateMove()
     {
-        targetedCybermon.TakeDamage(10);
+        //targetedCybermon.cybermonStatsAndVariables.TakeDamage(10);
     }
 }
